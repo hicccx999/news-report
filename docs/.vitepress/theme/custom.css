@@ -1,0 +1,6 @@
+/* 自定义样式 */
+:root {
+  --vp-c-danger: #dc2626;
+  --vp-c-danger-dark: #b91c1c;
+  --vp-c-warning: #f59e0b;
+}

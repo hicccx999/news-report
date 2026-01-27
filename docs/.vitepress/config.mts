@@ -41,7 +41,7 @@ function generateSidebar() {
           const date = file.match(/(\d{4}-\d{2}-\d{2})/)?.[1] || ''
           return {
             text: date,
-            link: `/news-archive/${file.replace('.md', '')}`
+            link: `/news-archive/${file.replace('.md', '')}.html`
           }
         })
       })
@@ -77,7 +77,7 @@ function generateNavLinks() {
     
     return {
       text: cat.text,
-      link: targetFile ? `/news-archive/${targetFile.replace('.md', '')}` : '/'
+      link: targetFile ? `/news-archive/${targetFile.replace('.md', '')}.html` : '/'
     }
   })
 }
@@ -86,13 +86,16 @@ export default defineConfig({
   title: '每日新闻报告',
   description: '每日新闻汇总 - AI、科技、财经、国内外要闻',
   lang: 'zh-CN',
+  base: '/news-report/',   // ⚠️ 必须有前后两个 /,
+  cleanUrls: false,
   
   // 主题配置
   themeConfig: {
     // 导航栏 - 动态生成
     nav: [
       { text: '首页', link: '/' },
-      ...generateNavLinks()
+      ...generateNavLinks(),
+      { text: '📖 使用指南', link: '/reader-guide' }
     ],
 
     // 侧边栏
@@ -167,12 +170,6 @@ export default defineConfig({
     sidebarMenuLabel: '菜单',
   },
 
-  // 构建配置
-  base: '/news-report/',
-  
-  // 清理 URL
-  cleanUrls: true,
-
   // Markdown 配置
   markdown: {
     lineNumbers: false,
@@ -188,5 +185,15 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#3eaf7c' }],
     ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }]
-  ]
+  ],
+
+  // Vite 配置
+  vite: {
+    server: {
+      // 确保开发服务器正确处理 base 路径
+      fs: {
+        strict: false
+      }
+    }
+  }
 })

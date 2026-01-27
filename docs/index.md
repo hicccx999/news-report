@@ -9,9 +9,8 @@ hero:
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useData, useRouter } from 'vitepress'
+import { withBase, useRouter } from 'vitepress'
 
-const { site } = useData()
 const router = useRouter()
 
 // 获取中国时区的当前日期
@@ -27,15 +26,14 @@ const getTodayDate = () => {
 
 const today = ref(getTodayDate())
 
-// 动态生成新闻链接（包含 base 路径）
+// 动态生成新闻链接（带 .html 后缀，因为 cleanUrls: false）
 const getNewsLink = (category) => {
-  return `${site.value.base}news-archive/${category}_${today.value}`
+  return withBase(`/news-archive/${category}_${today.value}.html`)
 }
 
-// 处理导航（用于 SPA 路由）
-const navigateTo = (category, event) => {
-  event.preventDefault()
-  router.go(`${site.value.base}news-archive/${category}_${today.value}`)
+// 使用 router 进行导航
+const goToNews = (category) => {
+  router.go(getNewsLink(category))
 }
 
 // 格式化日期显示
@@ -46,45 +44,45 @@ const formatDate = computed(() => {
 </script>
 
 <div class="home-hero-actions">
-  <a class="action-button brand" :href="getNewsLink('ai')" @click="navigateTo('ai', $event)">查看最新新闻</a>
-  <a class="action-button alt" :href="getNewsLink('tech')" @click="navigateTo('tech', $event)">浏览所有新闻</a>
+  <a class="action-button brand" :href="getNewsLink('ai')" @click.prevent="goToNews('ai')">查看最新新闻</a>
+  <a class="action-button alt" :href="getNewsLink('tech')" @click.prevent="goToNews('tech')">浏览所有新闻</a>
 </div>
 
 <div class="features-grid">
-  <div class="feature">
+  <a :href="getNewsLink('ai')" @click.prevent="goToNews('ai')" class="feature feature-link-wrapper">
     <div class="feature-icon">🤖</div>
     <h2 class="feature-title">AI 人工智能</h2>
     <p class="feature-details">追踪全球人工智能前沿动态，大模型、智能体、产业应用等最新进展</p>
-    <a :href="getNewsLink('ai')" @click="navigateTo('ai', $event)" class="feature-link">查看详情 →</a>
-  </div>
+    <span class="feature-link-arrow">查看详情 →</span>
+  </a>
   
-  <div class="feature">
+  <a :href="getNewsLink('tech')" @click.prevent="goToNews('tech')" class="feature feature-link-wrapper">
     <div class="feature-icon">🚀</div>
     <h2 class="feature-title">科技前沿</h2>
     <p class="feature-details">量子计算、航空航天、半导体等前沿科技领域的重大突破</p>
-    <a :href="getNewsLink('tech')" @click="navigateTo('tech', $event)" class="feature-link">查看详情 →</a>
-  </div>
+    <span class="feature-link-arrow">查看详情 →</span>
+  </a>
   
-  <div class="feature">
+  <a :href="getNewsLink('domestic')" @click.prevent="goToNews('domestic')" class="feature feature-link-wrapper">
     <div class="feature-icon">🏠</div>
     <h2 class="feature-title">国内新闻</h2>
     <p class="feature-details">国内政经要闻、社会热点、科技发展等重要资讯汇总</p>
-    <a :href="getNewsLink('domestic')" @click="navigateTo('domestic', $event)" class="feature-link">查看详情 →</a>
-  </div>
+    <span class="feature-link-arrow">查看详情 →</span>
+  </a>
   
-  <div class="feature">
+  <a :href="getNewsLink('international')" @click.prevent="goToNews('international')" class="feature feature-link-wrapper">
     <div class="feature-icon">🌍</div>
     <h2 class="feature-title">国际新闻</h2>
     <p class="feature-details">全球政治、经济、外交等国际要闻的深度追踪</p>
-    <a :href="getNewsLink('international')" @click="navigateTo('international', $event)" class="feature-link">查看详情 →</a>
-  </div>
+    <span class="feature-link-arrow">查看详情 →</span>
+  </a>
   
-  <div class="feature">
+  <a :href="getNewsLink('stocks')" @click.prevent="goToNews('stocks')" class="feature feature-link-wrapper">
     <div class="feature-icon">📈</div>
     <h2 class="feature-title">股市财经</h2>
     <p class="feature-details">股市动态、财经分析、投资热点等金融市场资讯</p>
-    <a :href="getNewsLink('stocks')" @click="navigateTo('stocks', $event)" class="feature-link">查看详情 →</a>
-  </div>
+    <span class="feature-link-arrow">查看详情 →</span>
+  </a>
   
   <div class="feature">
     <div class="feature-icon">🔍</div>
@@ -146,7 +144,20 @@ const formatDate = computed(() => {
   transition: all 0.25s;
 }
 
-.feature:hover {
+.feature-link-wrapper {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer;
+}
+
+.feature-link-wrapper:hover {
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature:not(.feature-link-wrapper):hover {
   border-color: var(--vp-c-brand-1);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -171,13 +182,13 @@ const formatDate = computed(() => {
   margin-bottom: 12px;
 }
 
-.feature-link {
+.feature-link-arrow {
   color: var(--vp-c-brand-1);
   font-weight: 500;
-  text-decoration: none;
+  display: inline-block;
 }
 
-.feature-link:hover {
+.feature-link-wrapper:hover .feature-link-arrow {
   text-decoration: underline;
 }
 </style>
@@ -187,11 +198,11 @@ const formatDate = computed(() => {
 ### {{ formatDate }}
 
 <div class="news-links">
-  <p><strong><a :href="getNewsLink('ai')" @click="navigateTo('ai', $event)">AI 人工智能</a></strong> - 大模型最新进展与产业动态</p>
-  <p><strong><a :href="getNewsLink('tech')" @click="navigateTo('tech', $event)">科技前沿</a></strong> - 量子计算、航空航天、半导体突破</p>
-  <p><strong><a :href="getNewsLink('domestic')" @click="navigateTo('domestic', $event)">国内新闻</a></strong> - 最新国内要闻汇总</p>
-  <p><strong><a :href="getNewsLink('international')" @click="navigateTo('international', $event)">国际新闻</a></strong> - 全球政经动态追踪</p>
-  <p><strong><a :href="getNewsLink('stocks')" @click="navigateTo('stocks', $event)">股市财经</a></strong> - 市场热点与投资分析</p>
+  <p><strong><a :href="getNewsLink('ai')">AI 人工智能</a></strong> - 大模型最新进展与产业动态</p>
+  <p><strong><a :href="getNewsLink('tech')">科技前沿</a></strong> - 量子计算、航空航天、半导体突破</p>
+  <p><strong><a :href="getNewsLink('domestic')">国内新闻</a></strong> - 最新国内要闻汇总</p>
+  <p><strong><a :href="getNewsLink('international')">国际新闻</a></strong> - 全球政经动态追踪</p>
+  <p><strong><a :href="getNewsLink('stocks')">股市财经</a></strong> - 市场热点与投资分析</p>
 </div>
 
 <style scoped>
@@ -223,6 +234,7 @@ const formatDate = computed(() => {
 ---
 
 <div style="text-align: center; margin-top: 40px; color: #666;">
-  <p>💡 使用顶部搜索框快速查找您感兴趣的新闻话题</p>
+  <p>� 每篇新闻页面都配备了智能朗读功能，支持语速调节</p>
+  <p>�💡 使用顶部搜索框快速查找您感兴趣的新闻话题</p>
   <p>📅 每日更新 · 专业汇总 · 全面覆盖</p>
 </div>
