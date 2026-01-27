@@ -26,8 +26,8 @@ const getTodayDate = () => {
 
 const today = ref(getTodayDate())
 
-// 动态生成新闻链接
-const getNewsLink = (category) => `/news-archive/${category}_${today.value}.html`
+// 动态生成新闻链接（不需要 .html 后缀，因为 cleanUrls: true）
+const getNewsLink = (category) => `/news-archive/${category}_${today.value}`
 
 // 格式化日期显示
 const formatDate = computed(() => {
