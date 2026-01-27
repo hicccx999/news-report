@@ -2,6 +2,17 @@ import { defineConfig } from 'vitepress'
 import { readdirSync, statSync } from 'fs'
 import { join } from 'path'
 
+// 获取中国时区的当前日期
+function getTodayDate() {
+  const now = new Date()
+  // 转换为中国时区 (UTC+8)
+  const chinaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }))
+  const year = chinaTime.getFullYear()
+  const month = String(chinaTime.getMonth() + 1).padStart(2, '0')
+  const day = String(chinaTime.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 // 自动生成侧边栏配置
 function generateSidebar() {
   const newsArchivePath = join(__dirname, '../../news-archive')
@@ -40,6 +51,37 @@ function generateSidebar() {
   return sidebar
 }
 
+// 生成动态导航链接
+function generateNavLinks() {
+  const today = getTodayDate()
+  const newsArchivePath = join(__dirname, '../../news-archive')
+  const files = readdirSync(newsArchivePath).filter(file => file.endsWith('.md'))
+  
+  const categories = [
+    { text: 'AI 人工智能', prefix: 'ai' },
+    { text: '科技前沿', prefix: 'tech' },
+    { text: '国内新闻', prefix: 'domestic' },
+    { text: '国际新闻', prefix: 'international' },
+    { text: '股市财经', prefix: 'stocks' }
+  ]
+  
+  return categories.map(cat => {
+    const todayFile = `${cat.prefix}_${today}.md`
+    const latestFile = files
+      .filter(f => f.startsWith(cat.prefix + '_'))
+      .sort()
+      .reverse()[0]
+    
+    // 优先使用今天的文件，如果不存在则使用最新的
+    const targetFile = files.includes(todayFile) ? todayFile : latestFile
+    
+    return {
+      text: cat.text,
+      link: targetFile ? `/news-archive/${targetFile.replace('.md', '')}` : '/'
+    }
+  })
+}
+
 export default defineConfig({
   title: '每日新闻报告',
   description: '每日新闻汇总 - AI、科技、财经、国内外要闻',
@@ -47,14 +89,10 @@ export default defineConfig({
   
   // 主题配置
   themeConfig: {
-    // 导航栏
+    // 导航栏 - 动态生成
     nav: [
       { text: '首页', link: '/' },
-      { text: 'AI 人工智能', link: '/news-archive/ai_2026-01-27' },
-      { text: '科技前沿', link: '/news-archive/tech_2026-01-27' },
-      { text: '国内新闻', link: '/news-archive/domestic_2026-01-27' },
-      { text: '国际新闻', link: '/news-archive/international_2026-01-27' },
-      { text: '股市财经', link: '/news-archive/stocks_2026-01-27' }
+      ...generateNavLinks()
     ],
 
     // 侧边栏
