@@ -214,16 +214,10 @@ const formatDate = computed(() => {
   text-decoration: underline;
 }
 
-.feature-link {
-  color: var(--vp-c-brand-1);
-  font-weight: 500;
-  text-decoration: none;
+.action-button, .feature-link {
   cursor: pointer;
 }
-
-.feature-link:hover {
-  text-decoration: underline;
-}
+</style>
 
 ---
 
