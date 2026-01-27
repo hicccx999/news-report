@@ -9,9 +9,10 @@ hero:
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useData } from 'vitepress'
+import { useData, useRouter } from 'vitepress'
 
 const { site } = useData()
+const router = useRouter()
 
 // 获取中国时区的当前日期
 const getTodayDate = () => {
@@ -26,10 +27,14 @@ const getTodayDate = () => {
 
 const today = ref(getTodayDate())
 
-// 动态生成新闻链接（包含 base 路径）
+// 动态生成新闻链接（相对路径，不包含 base）
 const getNewsLink = (category) => {
-  const base = site.value.base || '/'
-  return `${base}news-archive/${category}_${today.value}`
+  return `/news-archive/${category}_${today.value}`
+}
+
+// 处理导航
+const navigateTo = (category) => {
+  router.go(getNewsLink(category))
 }
 
 // 格式化日期显示
@@ -40,8 +45,8 @@ const formatDate = computed(() => {
 </script>
 
 <div class="home-hero-actions">
-  <a class="action-button brand" :href="getNewsLink('ai')">查看最新新闻</a>
-  <a class="action-button alt" :href="getNewsLink('tech')">浏览所有新闻</a>
+  <a class="action-button brand" @click.prevent="navigateTo('ai')" href="javascript:void(0)">查看最新新闻</a>
+  <a class="action-button alt" @click.prevent="navigateTo('tech')" href="javascript:void(0)">浏览所有新闻</a>
 </div>
 
 <div class="features-grid">
@@ -49,35 +54,35 @@ const formatDate = computed(() => {
     <div class="feature-icon">🤖</div>
     <h2 class="feature-title">AI 人工智能</h2>
     <p class="feature-details">追踪全球人工智能前沿动态，大模型、智能体、产业应用等最新进展</p>
-    <a :href="getNewsLink('ai')" class="feature-link">查看详情 →</a>
+    <a @click.prevent="navigateTo('ai')" href="javascript:void(0)" class="feature-link">查看详情 →</a>
   </div>
   
   <div class="feature">
     <div class="feature-icon">🚀</div>
     <h2 class="feature-title">科技前沿</h2>
     <p class="feature-details">量子计算、航空航天、半导体等前沿科技领域的重大突破</p>
-    <a :href="getNewsLink('tech')" class="feature-link">查看详情 →</a>
+    <a @click.prevent="navigateTo('tech')" href="javascript:void(0)" class="feature-link">查看详情 →</a>
   </div>
   
   <div class="feature">
     <div class="feature-icon">🏠</div>
     <h2 class="feature-title">国内新闻</h2>
     <p class="feature-details">国内政经要闻、社会热点、科技发展等重要资讯汇总</p>
-    <a :href="getNewsLink('domestic')" class="feature-link">查看详情 →</a>
+    <a @click.prevent="navigateTo('domestic')" href="javascript:void(0)" class="feature-link">查看详情 →</a>
   </div>
   
   <div class="feature">
     <div class="feature-icon">🌍</div>
     <h2 class="feature-title">国际新闻</h2>
     <p class="feature-details">全球政治、经济、外交等国际要闻的深度追踪</p>
-    <a :href="getNewsLink('international')" class="feature-link">查看详情 →</a>
+    <a @click.prevent="navigateTo('international')" href="javascript:void(0)" class="feature-link">查看详情 →</a>
   </div>
   
   <div class="feature">
     <div class="feature-icon">📈</div>
     <h2 class="feature-title">股市财经</h2>
     <p class="feature-details">股市动态、财经分析、投资热点等金融市场资讯</p>
-    <a :href="getNewsLink('stocks')" class="feature-link">查看详情 →</a>
+    <a @click.prevent="navigateTo('stocks')" href="javascript:void(0)" class="feature-link">查看详情 →</a>
   </div>
   
   <div class="feature">
@@ -181,11 +186,11 @@ const formatDate = computed(() => {
 ### {{ formatDate }}
 
 <div class="news-links">
-  <p><strong><a :href="getNewsLink('ai')">AI 人工智能</a></strong> - 大模型最新进展与产业动态</p>
-  <p><strong><a :href="getNewsLink('tech')">科技前沿</a></strong> - 量子计算、航空航天、半导体突破</p>
-  <p><strong><a :href="getNewsLink('domestic')">国内新闻</a></strong> - 最新国内要闻汇总</p>
-  <p><strong><a :href="getNewsLink('international')">国际新闻</a></strong> - 全球政经动态追踪</p>
-  <p><strong><a :href="getNewsLink('stocks')">股市财经</a></strong> - 市场热点与投资分析</p>
+  <p><strong><a @click.prevent="navigateTo('ai')" href="javascript:void(0)">AI 人工智能</a></strong> - 大模型最新进展与产业动态</p>
+  <p><strong><a @click.prevent="navigateTo('tech')" href="javascript:void(0)">科技前沿</a></strong> - 量子计算、航空航天、半导体突破</p>
+  <p><strong><a @click.prevent="navigateTo('domestic')" href="javascript:void(0)">国内新闻</a></strong> - 最新国内要闻汇总</p>
+  <p><strong><a @click.prevent="navigateTo('international')" href="javascript:void(0)">国际新闻</a></strong> - 全球政经动态追踪</p>
+  <p><strong><a @click.prevent="navigateTo('stocks')" href="javascript:void(0)">股市财经</a></strong> - 市场热点与投资分析</p>
 </div>
 
 <style scoped>
@@ -202,12 +207,23 @@ const formatDate = computed(() => {
   color: var(--vp-c-brand-1);
   text-decoration: none;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .news-links a:hover {
   text-decoration: underline;
 }
-</style>
+
+.feature-link {
+  color: var(--vp-c-brand-1);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.feature-link:hover {
+  text-decoration: underline;
+}
 
 ---
 
