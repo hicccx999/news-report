@@ -8,12 +8,8 @@ hero:
 ---
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useData } from 'vitepress'
-import { readdirSync } from 'fs'
-import { join } from 'path'
-
-const { site } = useData()
+import { ref, computed } from 'vue'
+import { withBase } from 'vitepress'
 
 // 获取中国时区的当前日期
 const getTodayDate = () => {
@@ -28,8 +24,8 @@ const getTodayDate = () => {
 
 const today = ref(getTodayDate())
 
-// 动态生成新闻链接
-const getNewsLink = (category) => `/news-archive/${category}_${today.value}`
+// 动态生成新闻链接（使用 withBase 确保正确的基础路径）
+const getNewsLink = (category) => withBase(`/news-archive/${category}_${today.value}`)
 
 // 格式化日期显示
 const formatDate = computed(() => {
