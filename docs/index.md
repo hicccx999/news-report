@@ -35,7 +35,7 @@ const getNewsLink = (category) => {
 // 处理导航（用于 SPA 路由）
 const navigateTo = (category, event) => {
   event.preventDefault()
-  router.go(`/news-archive/${category}_${today.value}`)
+  router.go(`${site.value.base}news-archive/${category}_${today.value}`)
 }
 
 // 格式化日期显示
