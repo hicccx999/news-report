@@ -62,34 +62,21 @@ const getPreferredVoice = () => {
 
   // 优先查找 Tingting（大小写不敏感）
   let voice = voices.find(v => v.name.toLowerCase().includes('tingting'))
-  
-  if (voice) {
-    console.log('选择语音：Tingting -', voice.name)
-    return voice
-  }
+  if (voice) return voice
   
   // 查找其他常见的中文语音（按优先级）
   const preferredNames = [
     'xiaoxiao', 'xiaoyi', 'xiaoyou', 'xiaochen',
-    'yunxi', 'yunxia', 'yunyang',
-    'google 中文'
+    'yunxi', 'yunxia', 'yunyang', 'google 中文'
   ]
   
   for (const name of preferredNames) {
     voice = voices.find(v => v.name.toLowerCase().includes(name))
-    if (voice) {
-      console.log('选择备选语音：', voice.name)
-      return voice
-    }
+    if (voice) return voice
   }
   
   // 最后尝试任何中文语音
-  voice = voices.find(v => v.lang.includes('zh') || v.lang.includes('CN'))
-  if (voice) {
-    console.log('选择默认中文语音：', voice.name)
-  }
-  
-  return voice
+  return voices.find(v => v.lang.includes('zh') || v.lang.includes('CN'))
 }
 
 onMounted(() => {
@@ -200,7 +187,6 @@ const speakNextSentence = () => {
   }
   if (preferredVoice) {
     utterance.voice = preferredVoice
-    console.log('实际使用的语音：', preferredVoice.name)
   }
   
   utterance.onend = () => {

@@ -1,6 +1,66 @@
 /* 自定义样式 */
 :root {
+  /* 自定义颜色 */
   --vp-c-danger: #dc2626;
   --vp-c-danger-dark: #b91c1c;
   --vp-c-warning: #f59e0b;
+  --vp-c-success: #10b981;
+  
+  /* 优化品牌色 */
+  --vp-c-brand-1: #3eaf7c;
+  --vp-c-brand-2: #359469;
+  --vp-c-brand-3: #2c7a56;
+}
+
+/* 优化链接样式 */
+.vp-doc a {
+  text-decoration: none;
+  border-bottom: 1px dashed var(--vp-c-brand-1);
+  transition: border-color 0.25s;
+}
+
+.vp-doc a:hover {
+  border-bottom-style: solid;
+}
+
+/* 优化代码块 */
+.vp-doc div[class*='language-'] {
+  border-radius: 8px;
+}
+
+/* 优化表格样式 */
+.vp-doc table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.vp-doc th,
+.vp-doc td {
+  padding: 10px 16px;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc th {
+  background: var(--vp-c-bg-soft);
+  font-weight: 600;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vp-c-divider);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vp-c-text-3);
 }

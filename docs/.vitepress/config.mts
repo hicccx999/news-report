@@ -1,11 +1,19 @@
 import { defineConfig } from 'vitepress'
-import { readdirSync, statSync } from 'fs'
+import { readdirSync } from 'fs'
 import { join } from 'path'
+
+// 新闻类别配置（统一管理）
+const NEWS_CATEGORIES = [
+  { text: 'AI 人工智能', prefix: 'ai' },
+  { text: '科技前沿', prefix: 'tech' },
+  { text: '国内新闻', prefix: 'domestic' },
+  { text: '国际新闻', prefix: 'international' },
+  { text: '股市财经', prefix: 'stocks' }
+]
 
 // 获取中国时区的当前日期
 function getTodayDate() {
   const now = new Date()
-  // 转换为中国时区 (UTC+8)
   const chinaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }))
   const year = chinaTime.getFullYear()
   const month = String(chinaTime.getMonth() + 1).padStart(2, '0')
@@ -13,71 +21,49 @@ function getTodayDate() {
   return `${year}-${month}-${day}`
 }
 
-// 自动生成侧边栏配置
-function generateSidebar() {
+// 获取新闻存档文件列表
+function getNewsFiles() {
   const newsArchivePath = join(__dirname, '../../news-archive')
-  const files = readdirSync(newsArchivePath)
+  return readdirSync(newsArchivePath)
     .filter(file => file.endsWith('.md'))
     .sort()
-    .reverse() // 最新的在前面
+    .reverse()
+}
 
-  // 按类别分组
-  const categories = {
-    'AI 人工智能': files.filter(f => f.startsWith('ai_')),
-    '科技前沿': files.filter(f => f.startsWith('tech_')),
-    '国内新闻': files.filter(f => f.startsWith('domestic_')),
-    '国际新闻': files.filter(f => f.startsWith('international_')),
-    '股市财经': files.filter(f => f.startsWith('stocks_'))
-  }
-
-  const sidebar = []
+// 自动生成侧边栏配置
+function generateSidebar() {
+  const files = getNewsFiles()
   
-  for (const [category, categoryFiles] of Object.entries(categories)) {
-    if (categoryFiles.length > 0) {
-      sidebar.push({
-        text: category,
+  return NEWS_CATEGORIES
+    .map(({ text, prefix }) => {
+      const categoryFiles = files.filter(f => f.startsWith(`${prefix}_`))
+      if (categoryFiles.length === 0) return null
+      
+      return {
+        text,
         collapsed: false,
-        items: categoryFiles.map(file => {
-          const date = file.match(/(\d{4}-\d{2}-\d{2})/)?.[1] || ''
-          return {
-            text: date,
-            link: `/news-archive/${file.replace('.md', '')}.html`
-          }
-        })
-      })
-    }
-  }
-
-  return sidebar
+        items: categoryFiles.map(file => ({
+          text: file.match(/(\d{4}-\d{2}-\d{2})/)?.[1] || '',
+          link: `/news-archive/${file.replace('.md', '')}`
+        }))
+      }
+    })
+    .filter(Boolean)
 }
 
 // 生成动态导航链接
 function generateNavLinks() {
   const today = getTodayDate()
-  const newsArchivePath = join(__dirname, '../../news-archive')
-  const files = readdirSync(newsArchivePath).filter(file => file.endsWith('.md'))
+  const files = getNewsFiles()
   
-  const categories = [
-    { text: 'AI 人工智能', prefix: 'ai' },
-    { text: '科技前沿', prefix: 'tech' },
-    { text: '国内新闻', prefix: 'domestic' },
-    { text: '国际新闻', prefix: 'international' },
-    { text: '股市财经', prefix: 'stocks' }
-  ]
-  
-  return categories.map(cat => {
-    const todayFile = `${cat.prefix}_${today}.md`
-    const latestFile = files
-      .filter(f => f.startsWith(cat.prefix + '_'))
-      .sort()
-      .reverse()[0]
-    
-    // 优先使用今天的文件，如果不存在则使用最新的
+  return NEWS_CATEGORIES.map(({ text, prefix }) => {
+    const todayFile = `${prefix}_${today}.md`
+    const latestFile = files.find(f => f.startsWith(`${prefix}_`))
     const targetFile = files.includes(todayFile) ? todayFile : latestFile
     
     return {
-      text: cat.text,
-      link: targetFile ? `/news-archive/${targetFile.replace('.md', '')}.html` : '/'
+      text,
+      link: targetFile ? `/news-archive/${targetFile.replace('.md', '')}` : '/'
     }
   })
 }
@@ -86,7 +72,7 @@ export default defineConfig({
   title: '每日新闻报告',
   description: '每日新闻汇总 - AI、科技、财经、国内外要闻',
   lang: 'zh-CN',
-  base: '/news-report/',   // ⚠️ 必须有前后两个 /,
+  base: '/news-report/',
   cleanUrls: false,
   
   // 主题配置
@@ -185,15 +171,5 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#3eaf7c' }],
     ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }]
-  ],
-
-  // Vite 配置
-  vite: {
-    server: {
-      // 确保开发服务器正确处理 base 路径
-      fs: {
-        strict: false
-      }
-    }
-  }
+  ]
 })

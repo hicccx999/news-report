@@ -8,79 +8,41 @@ hero:
 ---
 
 <script setup>
-import { ref, computed } from 'vue'
-import { withBase, useRouter } from 'vitepress'
-
-const router = useRouter()
+import { ref } from 'vue'
+import { withBase } from 'vitepress'
 
 // 获取中国时区的当前日期
 const getTodayDate = () => {
   const now = new Date()
-  // 转换为中国时区 (UTC+8)
   const chinaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }))
-  const year = chinaTime.getFullYear()
-  const month = String(chinaTime.getMonth() + 1).padStart(2, '0')
-  const day = String(chinaTime.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  return `${chinaTime.getFullYear()}-${String(chinaTime.getMonth() + 1).padStart(2, '0')}-${String(chinaTime.getDate()).padStart(2, '0')}`
 }
 
 const today = ref(getTodayDate())
 
-// 动态生成新闻链接（带 .html 后缀，因为 cleanUrls: false）
-const getNewsLink = (category) => {
-  return withBase(`/news-archive/${category}_${today.value}.html`)
-}
+// 动态生成新闻链接
+const getNewsLink = (category) => withBase(`/news-archive/${category}_${today.value}`)
 
-// 使用 router 进行导航
-const goToNews = (category) => {
-  router.go(getNewsLink(category))
-}
-
-// 格式化日期显示
-const formatDate = computed(() => {
-  const [year, month, day] = today.value.split('-')
-  return `${year}年${month}月${day}日`
-})
+// 新闻分类配置
+const categories = [
+  { id: 'ai', icon: '🤖', title: 'AI 人工智能', desc: '追踪全球人工智能前沿动态，大模型、智能体、产业应用等最新进展' },
+  { id: 'tech', icon: '🚀', title: '科技前沿', desc: '量子计算、航空航天、半导体等前沿科技领域的重大突破' },
+  { id: 'domestic', icon: '🏠', title: '国内新闻', desc: '国内政经要闻、社会热点、科技发展等重要资讯汇总' },
+  { id: 'international', icon: '🌍', title: '国际新闻', desc: '全球政治、经济、外交等国际要闻的深度追踪' },
+  { id: 'stocks', icon: '📈', title: '股市财经', desc: '股市动态、财经分析、投资热点等金融市场资讯' }
+]
 </script>
 
 <div class="home-hero-actions">
-  <a class="action-button brand" :href="getNewsLink('ai')" @click.prevent="goToNews('ai')">查看最新新闻</a>
-  <a class="action-button alt" :href="getNewsLink('tech')" @click.prevent="goToNews('tech')">浏览所有新闻</a>
+  <a class="action-button brand" :href="getNewsLink('ai')">查看最新新闻</a>
+  <a class="action-button alt" :href="getNewsLink('tech')">浏览所有新闻</a>
 </div>
 
 <div class="features-grid">
-  <a :href="getNewsLink('ai')" @click.prevent="goToNews('ai')" class="feature feature-link-wrapper">
-    <div class="feature-icon">🤖</div>
-    <h2 class="feature-title">AI 人工智能</h2>
-    <p class="feature-details">追踪全球人工智能前沿动态，大模型、智能体、产业应用等最新进展</p>
-    <span class="feature-link-arrow">查看详情 →</span>
-  </a>
-  
-  <a :href="getNewsLink('tech')" @click.prevent="goToNews('tech')" class="feature feature-link-wrapper">
-    <div class="feature-icon">🚀</div>
-    <h2 class="feature-title">科技前沿</h2>
-    <p class="feature-details">量子计算、航空航天、半导体等前沿科技领域的重大突破</p>
-    <span class="feature-link-arrow">查看详情 →</span>
-  </a>
-  
-  <a :href="getNewsLink('domestic')" @click.prevent="goToNews('domestic')" class="feature feature-link-wrapper">
-    <div class="feature-icon">🏠</div>
-    <h2 class="feature-title">国内新闻</h2>
-    <p class="feature-details">国内政经要闻、社会热点、科技发展等重要资讯汇总</p>
-    <span class="feature-link-arrow">查看详情 →</span>
-  </a>
-  
-  <a :href="getNewsLink('international')" @click.prevent="goToNews('international')" class="feature feature-link-wrapper">
-    <div class="feature-icon">🌍</div>
-    <h2 class="feature-title">国际新闻</h2>
-    <p class="feature-details">全球政治、经济、外交等国际要闻的深度追踪</p>
-    <span class="feature-link-arrow">查看详情 →</span>
-  </a>
-  
-  <a :href="getNewsLink('stocks')" @click.prevent="goToNews('stocks')" class="feature feature-link-wrapper">
-    <div class="feature-icon">📈</div>
-    <h2 class="feature-title">股市财经</h2>
-    <p class="feature-details">股市动态、财经分析、投资热点等金融市场资讯</p>
+  <a v-for="cat in categories" :key="cat.id" :href="getNewsLink(cat.id)" class="feature feature-link-wrapper">
+    <div class="feature-icon">{{ cat.icon }}</div>
+    <h2 class="feature-title">{{ cat.title }}</h2>
+    <p class="feature-details">{{ cat.desc }}</p>
     <span class="feature-link-arrow">查看详情 →</span>
   </a>
   
@@ -191,50 +153,27 @@ const formatDate = computed(() => {
 .feature-link-wrapper:hover .feature-link-arrow {
   text-decoration: underline;
 }
-</style>
 
-## 📰 最新更新
-
-### {{ formatDate }}
-
-<div class="news-links">
-  <p><strong><a :href="getNewsLink('ai')">AI 人工智能</a></strong> - 大模型最新进展与产业动态</p>
-  <p><strong><a :href="getNewsLink('tech')">科技前沿</a></strong> - 量子计算、航空航天、半导体突破</p>
-  <p><strong><a :href="getNewsLink('domestic')">国内新闻</a></strong> - 最新国内要闻汇总</p>
-  <p><strong><a :href="getNewsLink('international')">国际新闻</a></strong> - 全球政经动态追踪</p>
-  <p><strong><a :href="getNewsLink('stocks')">股市财经</a></strong> - 市场热点与投资分析</p>
-</div>
-
-<style scoped>
-.news-links {
-  margin: 24px 0;
-}
-
-.news-links p {
-  margin: 12px 0;
-  padding-left: 8px;
-}
-
-.news-links a {
-  color: var(--vp-c-brand-1);
-  text-decoration: none;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.news-links a:hover {
-  text-decoration: underline;
-}
-
-.action-button, .feature-link {
-  cursor: pointer;
+@media (max-width: 640px) {
+  .features-grid {
+    padding: 0 16px;
+    gap: 16px;
+  }
+  
+  .feature {
+    padding: 20px;
+  }
+  
+  .feature-icon {
+    font-size: 36px;
+  }
 }
 </style>
 
 ---
 
-<div style="text-align: center; margin-top: 40px; color: #666;">
-  <p>� 每篇新闻页面都配备了智能朗读功能，支持语速调节</p>
-  <p>�💡 使用顶部搜索框快速查找您感兴趣的新闻话题</p>
+<div style="text-align: center; margin-top: 40px; color: var(--vp-c-text-3);">
+  <p>🔊 每篇新闻页面都配备了智能朗读功能，支持语速调节</p>
+  <p>💡 使用顶部搜索框快速查找您感兴趣的新闻话题</p>
   <p>📅 每日更新 · 专业汇总 · 全面覆盖</p>
 </div>
