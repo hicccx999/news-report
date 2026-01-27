@@ -9,9 +9,9 @@ hero:
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vitepress'
+import { useData } from 'vitepress'
 
-const router = useRouter()
+const { site } = useData()
 
 // 获取中国时区的当前日期
 const getTodayDate = () => {
@@ -26,8 +26,11 @@ const getTodayDate = () => {
 
 const today = ref(getTodayDate())
 
-// 动态生成新闻链接（不需要 .html 后缀，因为 cleanUrls: true）
-const getNewsLink = (category) => `/news-archive/${category}_${today.value}`
+// 动态生成新闻链接（包含 base 路径）
+const getNewsLink = (category) => {
+  const base = site.value.base || '/'
+  return `${base}news-archive/${category}_${today.value}`
+}
 
 // 格式化日期显示
 const formatDate = computed(() => {
