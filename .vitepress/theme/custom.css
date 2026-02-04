@@ -64,3 +64,29 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--vp-c-text-3);
 }
+
+/* 隐藏底部默认的 lastUpdated（已移到正文开头显示） */
+.VPDocFooter .VPLastUpdated {
+  display: none !important;
+}
+
+/* 正文顶部的最后更新时间样式 */
+.last-updated-header {
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--vp-c-bg-soft);
+  border-radius: 8px;
+  font-size: 0.9em;
+  color: var(--vp-c-text-2);
+  border-left: 3px solid var(--vp-c-brand-1);
+}
+
+.last-updated-header .last-updated-label {
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.last-updated-header time {
+  color: var(--vp-c-text-1);
+  font-weight: 500;
+}

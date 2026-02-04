@@ -31,8 +31,8 @@ const NEWS_CATEGORIES: NewsCategory[] = [
 // 日期正则（复用）
 const DATE_REGEX = /(\d{4}-\d{2}-\d{2})/
 
-// 新闻存档目录路径（使用根目录下的真实目录，而非 docs 下的软链接）
-const NEWS_ARCHIVE_PATH = join(__dirname, '../../../news-archive')
+// 新闻存档目录路径
+const NEWS_ARCHIVE_PATH = join(__dirname, '../news-archive')
 
 // 获取新闻存档文件列表（缓存结果）
 const getNewsFiles = (() => {
