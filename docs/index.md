@@ -11,17 +11,8 @@ hero:
 import { ref } from 'vue'
 import { withBase } from 'vitepress'
 
-// 获取中国时区的当前日期
-const getTodayDate = () => {
-  const now = new Date()
-  const chinaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }))
-  return `${chinaTime.getFullYear()}-${String(chinaTime.getMonth() + 1).padStart(2, '0')}-${String(chinaTime.getDate()).padStart(2, '0')}`
-}
-
-const today = ref(getTodayDate())
-
 // 动态生成新闻链接
-const getNewsLink = (category) => withBase(`/news-archive/${category}_${today.value}`)
+const getNewsLink = (category) => withBase(`/news-archive/${category}`)
 
 // 新闻分类配置
 const categories = [

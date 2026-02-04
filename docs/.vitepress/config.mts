@@ -11,16 +11,6 @@ const NEWS_CATEGORIES = [
   { text: '股市财经', prefix: 'stocks' }
 ]
 
-// 获取中国时区的当前日期
-function getTodayDate() {
-  const now = new Date()
-  const chinaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }))
-  const year = chinaTime.getFullYear()
-  const month = String(chinaTime.getMonth() + 1).padStart(2, '0')
-  const day = String(chinaTime.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
 // 获取新闻存档文件列表
 function getNewsFiles() {
   const newsArchivePath = join(__dirname, '../../news-archive')
@@ -36,16 +26,25 @@ function generateSidebar() {
   
   return NEWS_CATEGORIES
     .map(({ text, prefix }) => {
-      const categoryFiles = files.filter(f => f.startsWith(`${prefix}_`))
+      // 匹配 prefix.md（不带日期）或 prefix_日期.md（带日期）
+      const categoryFiles = files.filter(f => 
+        f === `${prefix}.md` || f.startsWith(`${prefix}_`)
+      )
       if (categoryFiles.length === 0) return null
       
       return {
         text,
         collapsed: false,
-        items: categoryFiles.map(file => ({
-          text: file.match(/(\d{4}-\d{2}-\d{2})/)?.[1] || '',
-          link: `/news-archive/${file.replace('.md', '')}`
-        }))
+        items: categoryFiles.map(file => {
+          // 提取日期或使用"最新"标识
+          const dateMatch = file.match(/(\d{4}-\d{2}-\d{2})/)
+          const displayText = dateMatch ? dateMatch[1] : '📰 最新'
+          
+          return {
+            text: displayText,
+            link: `/news-archive/${file.replace('.md', '')}`
+          }
+        })
       }
     })
     .filter(Boolean)
@@ -53,17 +52,14 @@ function generateSidebar() {
 
 // 生成动态导航链接
 function generateNavLinks() {
-  const today = getTodayDate()
   const files = getNewsFiles()
   
   return NEWS_CATEGORIES.map(({ text, prefix }) => {
-    const todayFile = `${prefix}_${today}.md`
-    const latestFile = files.find(f => f.startsWith(`${prefix}_`))
-    const targetFile = files.includes(todayFile) ? todayFile : latestFile
+    const latestFile = `${prefix}.md`
     
     return {
       text,
-      link: targetFile ? `/news-archive/${targetFile.replace('.md', '')}` : '/'
+      link: `/news-archive/${latestFile.replace('.md', '')}`
     }
   })
 }
