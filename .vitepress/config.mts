@@ -96,6 +96,7 @@ export default defineConfig({
   lang: 'zh-CN',
   base: '/news-report/',
   cleanUrls: false,
+  ignoreDeadLinks: true,
   
   // 主题配置
   themeConfig: {
